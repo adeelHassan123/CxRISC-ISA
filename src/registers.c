@@ -2,7 +2,7 @@
 #include "isa.h"
 #include "utils.h"
 
-static int regs[NUM_REGS];
+static uint32_t regs[NUM_REGS];
 
 // Init all registers to zero
 void regs_init() {
@@ -21,14 +21,15 @@ int regs_read(int index) {
 void regs_write(int index, int value) {
     if (index <= 0 || index >= NUM_REGS)
         return; 
-    regs[index] = value;
+    regs[index] = (uint32_t)value; 
 }
 
 // dump data of all registers
 void regs_dump() {
-    for (int i = 0; i < NUM_REGS; i++)
-        printf("R%d = %d\n", i, regs[i]);
+    char bin[33];
+    // Print each register in binary format
+    for (int i = 0; i < NUM_REGS; i++) {
+        int_to_binary(regs[i], bin);
+        printf("R%d = %s (%d)\n", i, bin, (int)regs[i]);
+    }
 }
-
-
-

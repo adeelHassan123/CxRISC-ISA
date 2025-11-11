@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-void int_to_binary(uint32_t value, char *binary_str, int bits);
+void int_to_binary(uint32_t value, char *binary_str);
 
 uint32_t binary_to_int(const char *binary_str);
 

@@ -5,6 +5,7 @@
 #define MEM_SIZE 512
 #define NUM_INST 256 //Number of instructions in one program
 #define INST_SIZE 128 //Length of each instrucion line in asm code
+#define WORD_BITS    32         // 32-bit architecture
 
 typedef enum { //enum for unique numeric ID
     OP_NOP = 0,

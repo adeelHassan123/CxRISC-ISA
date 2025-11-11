@@ -35,28 +35,42 @@ int parse_reg(const char *tok) {
 
 // Breaking one line of instruction into instruction format
 int parse_line(const char *line, Instr *ins) {
-    if (!line || !ins) return -1;
-
-    char op[16], a[16], b[16], c[16];
-    int n = sscanf(line, "%15s %15[^,], %15[^,], %15s", op, a, b, c);
-    if (n <= 0) return -1;
+    char buf[INST_SIZE];
+    strcpy(buf, line);
+    char *tok = strtok(buf, " \t\n,");  // split on space/comma
+    if (!tok) return -1;
 
     *ins = (Instr){ OP_UNKNOWN, 0, 0, 0, 0 };
-    ins->op = opcode_from_str(op);
+    ins->op = opcode_from_str(tok);
 
-    // simple decoding based on opcode
-    if (ins->op == OP_LB || ins->op == OP_LW) {
-        ins->rd  = parse_reg(a);
-        ins->imm = atoi(b);
-    } else if (ins->op == OP_SB || ins->op == OP_SW) {
-        ins->rs1 = parse_reg(a);
-        ins->imm = atoi(b);
-    } else if (ins->op == OP_ADD || ins->op == OP_ADDI) {
-        ins->rd  = parse_reg(a);
-        ins->rs1 = parse_reg(b);
-        ins->rs2 = parse_reg(c);
+    char *tokens[4];
+    int i = 0;
+    while ((tok = strtok(NULL, " \t\n,")) && i < 4)
+        tokens[i++] = tok;
+
+    // Parse based on instruction type
+    if (ins->op == OP_LW || ins->op == OP_LB) {
+        ins->rd = parse_reg(tokens[0]);
+        ins->imm = atoi(tokens[1]);
     }
-
+    else if (ins->op == OP_SW || ins->op == OP_SB) {
+        ins->rs1 = parse_reg(tokens[0]);
+        ins->imm = atoi(tokens[1]);
+    }
+    else if (ins->op == OP_ADD) {
+        ins->rd = parse_reg(tokens[0]);
+        ins->rs1 = parse_reg(tokens[1]);
+        ins->rs2 = parse_reg(tokens[2]);
+    }
+    else if (ins->op == OP_ADDI) {
+        ins->rd = parse_reg(tokens[0]);
+        ins->rs1 = parse_reg(tokens[1]);
+        ins->imm = atoi(tokens[2]);
+    }
+    else if (ins->op == OP_NOP) {
+        return 0;
+    } else return -1;
+    
     return 0;
 }
 

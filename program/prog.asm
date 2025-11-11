@@ -1,5 +1,6 @@
-LOAD  R1, 5      
-LOAD  R2, 3      
-ADD   R3, R1, R2 
-STORE R3, 2      
-NOP     
+LW R1, 0
+LW R2, 1
+ADD R3, R1, R2
+ADDI R4, R3, 10
+SW R4, 2
+NOP

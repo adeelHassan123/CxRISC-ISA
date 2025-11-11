@@ -1,13 +1,8 @@
 #include "isa.h"
-#include "utils.h"
+#include "registers.h"
+#include "memory.h"
 #include <stdio.h>
 
-int regs_read(int i);
-void regs_write(int i, int val);
-int mem_read(int addr);
-void mem_write(int addr, int val);
-
-// Run program (single-cycle execution) 
 void run_program(Instr prog[], int prog_size) {
     int pc = 0; 
 
@@ -37,7 +32,6 @@ void run_program(Instr prog[], int prog_size) {
             case OP_UNKNOWN:
                 break;
         }
-
         pc++; // next instruction
     }
 }

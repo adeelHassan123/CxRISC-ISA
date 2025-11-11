@@ -1,14 +1,9 @@
 #include <stdio.h>
 #include "isa.h"
-#include "utils.h"
-
-void regs_init();
-void regs_dump();
-void mem_init();
-void mem_dump(int start, int end);
-int load_program(const char *path, Instr prog[], int *count);
-void run_program(Instr prog[], int prog_size);
-void mem_write(int addr, int val); 
+#include "registers.h"
+#include "memory.h"
+#include "program_loader.h"
+#include "single_cycle.h"
 
 #define PROGRAM_PATH "program/prog.asm"
 
@@ -36,6 +31,7 @@ int main() {
     run_program(program, prog_count);
 
     // Step 5: Dump final state
+    printf("\n--- Final State ---\n");
     regs_dump();         
     mem_dump(0, 10);   
 
