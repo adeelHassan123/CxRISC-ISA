@@ -1,37 +1,50 @@
+#include <stdio.h>
 #include "isa.h"
 #include "registers.h"
 #include "memory.h"
-#include <stdio.h>
+#include "decode.h"
+#include "execute.h"
+#include "trace.h"
 
-void run_program(Instr prog[], int prog_size) {
-    int pc = 0; 
+#define PROGRAM_PATH "program/prog.asm"
 
-    while (pc >= 0 && pc < prog_size) {
-        Instr *I = &prog[pc];
+void run_program(uint32_t imem[], int prog_size_words) {
+    trace_init(PROGRAM_PATH, prog_size_words);
 
-        switch (I->op) {
+    uint32_t pc = 0;
+    const uint32_t end_pc = prog_size_words * 4;
+    int cycle = 1;
 
-            // Arithmetic / Logical 
-            case OP_ADD:
-                regs_write(I->rd, regs_read(I->rs1) + regs_read(I->rs2));
-                break;
-            case OP_ADDI:
-                regs_write(I->rd, regs_read(I->rs1) + I->imm);
-                break;
+    while (pc < end_pc) {
+        // FETCH
+        uint32_t raw_instr = imem[pc >> 2];
 
-            // Load / Store
-            case OP_LB: case OP_LW:
-                regs_write(I->rd, mem_read(I->imm));
-                break;
-            case OP_SB: case OP_SW:
-                mem_write(I->imm, regs_read(I->rs1));
-                break;
+        // DECODE 
+        DecodedInstr ins = decode(raw_instr);
 
-            // Control 
-            case OP_NOP:
-            case OP_UNKNOWN:
-                break;
+        if (ins.op == OP_UNKNOWN) {
+            fprintf(trace_file, "ERROR: Unknown instruction at PC=0x%04x\n", pc);
+            break;
         }
-        pc++; // next instruction
+
+        // REGISTER READ
+        int32_t rs1_val = (ins.rs1 >= 0) ? regs_read(ins.rs1) : 0;
+        int32_t rs2_val = (ins.rs2 >= 0) ? regs_read(ins.rs2) : 0;
+
+        // EXECUTE + MEMORY 
+        ExecuteResult ex = execute_instruction(ins, rs1_val, rs2_val);
+
+        //  WRITEBACK 
+        execute_writeback(ins, ex.wb_data);
+
+        //  TRACE OUTPUT
+        trace_cycle(pc, raw_instr, ins, rs1_val, rs2_val,
+                    ex.alu_result, ex.mem_data, ex.wb_data,
+                    cycle++, ex.mem_read, ex.mem_write);
+
+        pc += 4;
     }
+
+    trace_final(cycle - 1);
+    trace_close();
 }

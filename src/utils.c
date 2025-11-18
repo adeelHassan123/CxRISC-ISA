@@ -19,3 +19,9 @@ uint32_t binary_to_int(const char *binary_str) {
 void print_bin_label(const char *label, const char *binary_str) {
     printf("%s %s\n", label, binary_str);
 }
+
+int32_t sign_extend(uint32_t val, int width) {
+    if (width >= 32) return (int32_t)val;
+    int32_t sign_bit = (val >> (width - 1)) & 1;
+    return sign_bit ? (int32_t)(val | (0xFFFFFFFF << width)) : (int32_t)val;
+}

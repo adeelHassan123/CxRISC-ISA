@@ -3,6 +3,6 @@
 
 #include "isa.h"
 
-int load_program(const char *path, Instr prog[], int *count);
+int load_program(const char *path, uint32_t imem[], int *count);
 
 #endif

@@ -18,10 +18,10 @@ int regs_read(int index) {
 }
 
 //Write data to registers
-void regs_write(int index, int value) {
+void regs_write(int index, int32_t value) {
     if (index <= 0 || index >= NUM_REGS)
         return; 
-    regs[index] = (uint32_t)value; 
+    regs[index] = value; 
 }
 
 // dump data of all registers

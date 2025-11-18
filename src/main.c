@@ -8,32 +8,23 @@
 #define PROGRAM_PATH "program/prog.asm"
 
 int main() {
-    Instr program[NUM_INST];  
-    int prog_count = 0;
+    uint32_t imem[IMEM_SIZE] = {0};
+    int prog_size = 0;
 
-    // Step 1: Initialize registers and memory 
+    printf("RISC-V Single-Cycle CPU Simulator \n");
     regs_init();
     mem_init();
 
-    // Step 2: Preload memory for testing
-    mem_write(0, 5);
-    mem_write(1, 3);
-
-    // Step 3: Load program
-    if (load_program(PROGRAM_PATH, program, &prog_count) != 0) {
-        printf("Error: could not load program at '%s'\n", PROGRAM_PATH);
+    if (load_program(PROGRAM_PATH, imem, &prog_size) != 0) {
+        printf("Failed to load program\n", PROGRAM_PATH);
         return 1;
     }
 
-    printf("Program loaded: %d instructions\n", prog_count);
+    printf("Starting execution... Full trace in 'trace.txt'\n\n");
 
-    // Step 4: Run program
-    run_program(program, prog_count);
+    run_program(imem, prog_size);
 
-    // Step 5: Dump final state
-    printf("\n--- Final State ---\n");
-    regs_dump();         
-    mem_dump(0, 10);   
+    printf("\nExecution complete! Check 'trace.txt' for detailes\n");
 
     return 0;
 }
